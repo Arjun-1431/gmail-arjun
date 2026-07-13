@@ -1,6 +1,6 @@
 {
   "buildCommand": "npm run build",
-  "devCommand": "node server.js",
+  "devCommand": "npm run dev",
   "env": {
     "GOOGLE_CLIENT_ID": "@google_client_id",
     "GOOGLE_CLIENT_SECRET": "@google_client_secret",
@@ -9,11 +9,12 @@
     "NVIDIA_API_KEY": "@nvidia_api_key",
     "NVIDIA_MODEL": "@nvidia_model",
     "NEXT_PUBLIC_APP_URL": "@next_public_app_url",
-    "PORT": "3000"
+    "CRON_SECRET": "@cron_secret"
   },
-  "functions": {
-    "server.js": {
-      "runtime": "nodejs18.x"
+  "crons": [
+    {
+      "path": "/api/cron/followups",
+      "schedule": "*/15 * * * *"
     }
-  }
+  ]
 }

@@ -74,12 +74,13 @@ export default function Sidebar() {
             </button>
           </>
         ) : (
-          <a
+          <Link
             href="/api/auth/google"
+            prefetch={false}
             className="rounded-md bg-zinc-950 px-3 py-2 text-sm font-medium text-white hover:bg-zinc-800 md:mt-4 md:block md:text-center"
           >
             {authStatus.loading ? "Checking..." : "Connect"}
-          </a>
+          </Link>
         )}
       </div>
       <nav className="flex gap-1 overflow-x-auto px-3 pb-3 md:block md:space-y-1 md:overflow-visible">

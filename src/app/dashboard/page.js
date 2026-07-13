@@ -87,12 +87,13 @@ export default function DashboardPage() {
           </p>
         </div>
         {!connected && (
-          <a
+          <Link
             href="/api/auth/google"
+            prefetch={false}
             className="w-fit rounded-md bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
           >
             Connect Gmail
-          </a>
+          </Link>
         )}
       </div>
 
@@ -102,9 +103,13 @@ export default function DashboardPage() {
           {!connected && (
             <>
               {" "}
-              <a className="font-medium underline" href="/api/auth/google">
+              <Link
+                className="font-medium underline"
+                href="/api/auth/google"
+                prefetch={false}
+              >
                 Connect Gmail
-              </a>
+              </Link>
             </>
           )}
         </div>

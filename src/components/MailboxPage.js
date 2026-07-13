@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import AppShell from "./AppShell";
 import EmailTable from "./EmailTable";
@@ -168,9 +169,13 @@ export default function MailboxPage({ title, endpoint }) {
       {error && (
         <div className="mb-4 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
           {error}{" "}
-          <a className="font-medium underline" href="/api/auth/google">
+          <Link
+            className="font-medium underline"
+            href="/api/auth/google"
+            prefetch={false}
+          >
             Connect Gmail
-          </a>
+          </Link>
         </div>
       )}
 
