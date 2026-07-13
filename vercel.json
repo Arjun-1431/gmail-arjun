@@ -8,13 +8,12 @@
     "SESSION_SECRET": "@session_secret",
     "NVIDIA_API_KEY": "@nvidia_api_key",
     "NVIDIA_MODEL": "@nvidia_model",
-    "NEXT_PUBLIC_APP_URL": "@next_public_app_url",
-    "CRON_SECRET": "@cron_secret"
+    "NEXT_PUBLIC_APP_URL": "@next_public_app_url"
   },
   "crons": [
     {
       "path": "/api/cron/followups",
-      "schedule": "*/15 * * * *"
+      "schedule": "0 0 * * *"
     }
   ]
 }
