@@ -14,6 +14,14 @@ const statCards = [
   ["trash", "Total Trash"],
 ];
 
+function sortImportantEmails(emails) {
+  return (emails || []).sort(
+    (a, b) =>
+      (b.sortTime || Date.parse(b.date) || 0) -
+      (a.sortTime || Date.parse(a.date) || 0)
+  );
+}
+
 export default function DashboardPage() {
   const [stats, setStats] = useState(null);
   const [profile, setProfile] = useState(null);
@@ -34,24 +42,38 @@ export default function DashboardPage() {
     setLoading(true);
     setError("");
     try {
-      const [profileResponse, statsResponse, importantResponse] =
-        await Promise.all([
+      const [profileResult, statsResult, importantResult] =
+        await Promise.allSettled([
           api.get("/api/gmail/profile"),
           api.get("/api/gmail/stats"),
           api.get("/api/inbox/important"),
         ]);
-      setProfile(profileResponse.data);
+
+      if (profileResult.status === "rejected") {
+        throw profileResult.reason;
+      }
+
+      setProfile(profileResult.value.data);
       setConnected(true);
-      setStats(statsResponse.data);
-      setImportantEmails(
-        (importantResponse.data.emails || []).sort(
-          (a, b) =>
-            (b.sortTime || Date.parse(b.date) || 0) -
-            (a.sortTime || Date.parse(a.date) || 0)
-        )
-      );
+
+      if (statsResult.status === "fulfilled") {
+        setStats(statsResult.value.data);
+      } else {
+        setStats(null);
+        setError(getErrorMessage(statsResult.reason));
+      }
+
+      if (importantResult.status === "fulfilled") {
+        setImportantEmails(sortImportantEmails(importantResult.value.data.emails));
+      } else {
+        setImportantEmails([]);
+        setError((current) => current || getErrorMessage(importantResult.reason));
+      }
     } catch (err) {
       setConnected(false);
+      setProfile(null);
+      setStats(null);
+      setImportantEmails([]);
       setError(getErrorMessage(err));
     } finally {
       setLoading(false);
@@ -69,7 +91,7 @@ export default function DashboardPage() {
     setError("");
     try {
       const response = await api.post("/api/inbox/important/analyze?limit=50");
-      setImportantEmails(response.data.emails || []);
+      setImportantEmails(sortImportantEmails(response.data.emails));
     } catch (err) {
       setError(getErrorMessage(err));
     } finally {

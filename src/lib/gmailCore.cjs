@@ -27,6 +27,8 @@ const INBOX_CATEGORY_LABELS = {
   forums: "CATEGORY_FORUMS",
 };
 
+const READ_ONLY_FS_ERROR_CODES = new Set(["EROFS", "EACCES", "EPERM"]);
+
 function getOAuthClient() {
   const { GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_REDIRECT_URI } =
     process.env;
@@ -222,7 +224,13 @@ function createRawEmail({ to, subject, body, cc, bcc, inReplyTo, references }) {
 }
 
 function ensureDataDir() {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+  try {
+    fs.mkdirSync(DATA_DIR, { recursive: true });
+  } catch (error) {
+    if (!READ_ONLY_FS_ERROR_CODES.has(error.code)) {
+      throw error;
+    }
+  }
 }
 
 function readJobStore() {
@@ -239,7 +247,16 @@ function readJobStore() {
 
 function writeJobStore(store) {
   ensureDataDir();
-  fs.writeFileSync(JOB_STORE_PATH, JSON.stringify(store, null, 2));
+  try {
+    fs.writeFileSync(JOB_STORE_PATH, JSON.stringify(store, null, 2));
+  } catch (error) {
+    if (READ_ONLY_FS_ERROR_CODES.has(error.code)) {
+      console.warn("Job store is read-only in this runtime; skipping file write.");
+      return false;
+    }
+    throw error;
+  }
+  return true;
 }
 
 function getAccount(store, emailAddress) {
